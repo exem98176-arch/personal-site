@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Portfolio — Sebastian Sawicki</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body { background:#180531; margin:0; padding-top:46px; }
+  .top-bar { padding: 40px 40px 0; }
+  .page-title { font-weight: 900; font-size: 56px; color: #fff; margin-bottom: 4px; }
+  .page-sub { color:#bbb; padding: 0 40px 20px; font-size:15px; }
+</style>
+</head>
+<body>
+
+<nav id="site-nav">
+  <a href="index.html">Home</a>
+  <a href="portfolio.html">Portfolio</a>
+  <a href="business.html">Business</a>
+  <a href="collaborations.html">Collaboration</a>
+  <a href="future-goals.html">Future Goals</a>
+  <a href="contact.html">Contact</a>
+  <a href="admin.html" style="opacity:0.5;">Admin</a>
+</nav>
+
+<div id="loading-overlay" class="hidden">
+  <div class="terminal-banner"><span>SEB POWER SHELL</span></div>
+  <div id="loading-text">_Proj File loading.</div>
+</div>
+
+<div class="top-bar">
+  <button class="back-button" onclick="window.location.href='index.html'"><span>Back to homepage</span></button>
+  <h1 class="page-title">The Whole Portfolio</h1>
+</div>
+<p class="page-sub">39 projects, organized by category. Click any project to open its full report.</p>
+
+<div id="categories-container">Loading projects…</div>
+
+<script src="assets/data-layer.js"></script>
+<script src="assets/loading.js"></script>
+<script>
+async function render() {
+  const container = document.getElementById('categories-container');
+  try {
+    const projects = await loadMergedProjects();
+    const byCategory = {};
+    projects.forEach(p => {
+      const cat = p.category || 'Other';
+      if (!byCategory[cat]) byCategory[cat] = [];
+      byCategory[cat].push(p);
+    });
+
+    container.innerHTML = '';
+    Object.keys(byCategory).forEach(cat => {
+      const section = document.createElement('div');
+      section.className = 'dyn-category';
+      const heading = document.createElement('h3');
+      heading.textContent = cat;
+      section.appendChild(heading);
+
+      const grid = document.createElement('div');
+      grid.className = 'dyn-grid';
+      byCategory[cat].forEach(p => {
+        const a = document.createElement('a');
+        a.className = 'dyn-card';
+        a.href = `project-detail.html?slug=${encodeURIComponent(p.slug)}`;
+        a.onclick = (e) => {
+          e.preventDefault();
+          navigateWithLoading(`project-detail.html?slug=${encodeURIComponent(p.slug)}`);
+        };
+        a.innerHTML = `<img src="${p.image}" alt="${p.title}"><div class="dyn-label">${p.title}</div>`;
+        grid.appendChild(a);
+      });
+      section.appendChild(grid);
+      container.appendChild(section);
+    });
+  } catch (e) {
+    container.textContent = 'Could not load project data.';
+    console.error(e);
+  }
+}
+render();
+</script>
+</body>
+</html>

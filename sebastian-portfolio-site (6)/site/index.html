@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sebastian Sawicki — Portfolio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body { background: #180531; margin:0; padding-top: 46px; }
+  .hotspot { background: transparent; }
+  /* uncomment to debug: .hotspot { background: rgba(255,0,0,0.25); } */
+</style>
+</head>
+<body>
+
+<nav id="site-nav">
+  <a href="index.html">Home</a>
+  <a href="portfolio.html">Portfolio</a>
+  <a href="business.html">Business</a>
+  <a href="collaborations.html">Collaboration</a>
+  <a href="future-goals.html">Future Goals</a>
+  <a href="contact.html">Contact</a>
+  <a href="admin.html" style="opacity:0.5;">Admin</a>
+</nav>
+
+<div id="boot-overlay" style="position:fixed;inset:0;background:#030101;z-index:9999;">
+  <div style="display:inline-flex;align-items:center;height:80px;padding:0 32px 0 20px;margin-top:40px;background:#6fa650;clip-path:polygon(0 0,88% 0,100% 50%,88% 100%,0 100%);">
+    <span style="font-family:'Audiowide',sans-serif;font-size:36px;color:#000;white-space:nowrap;">SEB POWER SHELL</span>
+  </div>
+  <pre id="boot-text" style="font-family:'Audiowide',sans-serif;color:#27e721;font-size:28px;margin-left:24px;margin-top:32px;line-height:1.6;"></pre>
+  <div id="boot-smiley" style="display:none;text-align:right;padding-right:80px;font-size:120px;color:#7ee55a;">:)</div>
+</div>
+
+<div class="real-page-wrap">
+  <img src="assets/page-homepage.jpg" alt="Sebastian Sawicki homepage">
+
+  <div class="hotspot" style="top:32.2%; left:8%; width:29%; height:2.2%;"
+       onclick="window.location.href='portfolio.html'" title="My Projects"></div>
+
+  <div class="hotspot" style="top:50.9%; left:53%; width:30%; height:2.2%;"
+       onclick="window.location.href='business.html'" title="My Business"></div>
+
+  <div class="hotspot" style="top:65.1%; left:6%; width:27%; height:2.2%;"
+       onclick="window.location.href='collaborations.html'" title="My Collaboration"></div>
+
+  <div class="hotspot" style="top:78.9%; left:45%; width:29%; height:3%;"
+       onclick="window.location.href='future-goals.html'" title="Future Goals"></div>
+
+  <div class="hotspot" style="top:92.2%; left:35%; width:20%; height:2.2%;"
+       onclick="window.location.href='contact.html'" title="Contact Me"></div>
+</div>
+
+<script>
+const bootLines = [
+  "/Define Sebastian S",
+  "Inventor/Engineer/Buisnessmen",
+  "/Pip Run Website (Personal)",
+  "Boot",
+  "initializing",
+  "alloting cframe",
+  "Boot=true",
+  "GO"
+];
+const bootEl = document.getElementById('boot-text');
+const overlay = document.getElementById('boot-overlay');
+const smiley = document.getElementById('boot-smiley');
+let i = 0;
+function typeLine() {
+  if (i < bootLines.length) {
+    bootEl.textContent += (i>0 ? "\n" : "") + bootLines[i];
+    i++;
+    setTimeout(typeLine, 260);
+  } else {
+    smiley.style.display = 'block';
+    setTimeout(() => { overlay.style.display = 'none'; }, 700);
+  }
+}
+typeLine();
+</script>
+
+</body>
+</html>

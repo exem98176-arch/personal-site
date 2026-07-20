@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Project — Sebastian Sawicki</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body { margin:0; padding-top:46px; background:#f4f4f6; }
+  .report-wrap { max-width: 880px; margin: 0 auto; padding: 50px 40px 100px; background:#fff; min-height: 60vh; }
+  .report-author { color:#5b4fd6; font-weight:700; font-size:22px; margin-bottom:24px; }
+  .report-title { color:#1a1a6e; font-size:44px; margin:0 0 4px; }
+  .report-date { color:#e0197d; font-size:15px; margin-bottom:28px; }
+  .report-h2 { font-size:26px; color:#111; margin:30px 0 10px; font-weight:600; }
+  .report-body { color:#444; font-size:16px; line-height:1.6; margin-bottom:10px; }
+  .report-img { width:100%; max-width:420px; border-radius:6px; float:left; margin:0 24px 16px 0; }
+  .report-clear { clear:both; }
+  .report-label { color:#e0197d; font-weight:700; margin-top:18px; }
+  .pdf-link { display:inline-block; margin-top:20px; padding:10px 20px; background:#5b4fd6; color:#fff; border-radius:20px; font-weight:700; font-size:14px; }
+  #loading-state { text-align:center; padding:100px 20px; color:#999; font-family:'Inter',sans-serif; }
+</style>
+</head>
+<body>
+<nav id="site-nav">
+  <a href="index.html">Home</a>
+  <a href="portfolio.html">Portfolio</a>
+  <a href="business.html">Business</a>
+  <a href="collaborations.html">Collaboration</a>
+  <a href="future-goals.html">Future Goals</a>
+  <a href="contact.html">Contact</a>
+  <a href="admin.html" style="opacity:0.5;">Admin</a>
+</nav>
+
+<div id="loading-overlay" class="hidden">
+  <div class="terminal-banner"><span>SEB POWER SHELL</span></div>
+  <div id="loading-text">_Proj File loading.</div>
+</div>
+
+<div id="report-content" style="display:none;">
+  <div class="report-wrap">
+    <div class="report-author">Sebastian Sawicki</div>
+    <h1 class="report-title" id="p-title"></h1>
+    <div class="report-date" id="p-category"></div>
+
+    <h2 class="report-h2">Project Overview</h2>
+    <img class="report-img" id="p-img" src="" alt="">
+    <p class="report-body" id="p-overview"></p>
+
+    <div id="why-block">
+      <div class="report-label">Why?</div>
+      <p class="report-body" id="p-why"></p>
+    </div>
+
+    <div id="how-block">
+      <div class="report-label">How</div>
+      <p class="report-body" id="p-how"></p>
+    </div>
+
+    <div class="report-clear"></div>
+    <div id="conclusion-block">
+      <h2 class="report-h2">Conclusion</h2>
+      <p class="report-body" id="p-conclusion"></p>
+    </div>
+
+    <a id="p-pdf-link" class="pdf-link" style="display:none;" target="_blank">View original PDF report →</a>
+  </div>
+  <div style="text-align:center; padding-bottom:40px; background:#fff;">
+    <button class="back-button" onclick="window.location.href='portfolio.html'"><span>Back to portfolio</span></button>
+  </div>
+</div>
+
+<div id="loading-state">Loading project…</div>
+
+<script src="assets/data-layer.js"></script>
+<script>
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
+  if (!slug) { document.getElementById('loading-state').textContent = 'No project specified.'; return; }
+
+  try {
+    const projects = await loadMergedProjects();
+    const p = projects.find(x => x.slug === slug);
+    if (!p) { document.getElementById('loading-state').textContent = 'Project not found.'; return; }
+
+    document.title = p.title + ' — Sebastian Sawicki';
+    document.getElementById('p-title').textContent = p.title;
+    document.getElementById('p-category').textContent = p.category || '';
+    document.getElementById('p-img').src = p.image;
+    document.getElementById('p-img').alt = p.title;
+    document.getElementById('p-overview').textContent = p.overview || '';
+
+    if (p.why) { document.getElementById('p-why').textContent = p.why; }
+    else { document.getElementById('why-block').style.display = 'none'; }
+
+    if (p.how) { document.getElementById('p-how').textContent = p.how; }
+    else { document.getElementById('how-block').style.display = 'none'; }
+
+    if (p.conclusion) { document.getElementById('p-conclusion').textContent = p.conclusion; }
+    else { document.getElementById('conclusion-block').style.display = 'none'; }
+
+    if (p.pdfLink) {
+      const a = document.getElementById('p-pdf-link');
+      a.href = p.pdfLink;
+      a.style.display = 'inline-block';
+    }
+
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('report-content').style.display = 'block';
+  } catch (e) {
+    document.getElementById('loading-state').textContent = 'Error loading project data.';
+    console.error(e);
+  }
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin — Sebastian Sawicki Portfolio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body { margin:0; padding-top:46px; background:#15121f; font-family:'Inter',sans-serif; }
+  .admin-wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 100px; color:#eee; }
+  .admin-title { font-size: 32px; font-weight:900; margin-bottom: 6px; }
+  .admin-sub { color:#999; font-size:14px; margin-bottom:30px; line-height:1.5; }
+  .admin-sub b { color:#ffa0f2; }
+
+  #login-gate { max-width: 380px; margin: 80px auto; text-align:center; }
+  #login-gate input { width:100%; padding:14px; border-radius:10px; border:none; font-size:16px; margin-bottom:12px; }
+  #login-gate button { width:100%; padding:14px; border-radius:10px; border:none; background:#5b4fd6; color:#fff; font-weight:700; font-size:16px; cursor:pointer; }
+  #login-error { color:#ff8a8a; font-size:13px; margin-top:8px; min-height:18px; }
+
+  .panel { background:#201c30; border-radius:16px; padding:28px; margin-bottom:28px; }
+  .panel h2 { margin-top:0; font-size:20px; }
+  label { display:block; font-size:13px; color:#bbb; margin:14px 0 6px; }
+  input[type=text], input[type=url], select, textarea {
+    width:100%; padding:12px 14px; border-radius:8px; border:1px solid #3a3550;
+    background:#15121f; color:#eee; font-size:14px; font-family:inherit; box-sizing:border-box;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  input[type=file] { color:#ccc; }
+
+  .row { display:flex; gap:16px; flex-wrap:wrap; }
+  .row > div { flex:1; min-width:220px; }
+
+  .btn { padding:12px 22px; border-radius:24px; border:none; font-weight:700; cursor:pointer; font-size:14px; }
+  .btn-primary { background:#5b4fd6; color:#fff; }
+  .btn-secondary { background:#3a3550; color:#eee; }
+  .btn-danger { background:#7a2a2a; color:#fff; }
+  .btn-row { display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; }
+
+  .photo-preview { width:160px; height:120px; object-fit:cover; border-radius:8px; margin-top:10px; background:#0a0812; }
+
+  table { width:100%; border-collapse: collapse; margin-top:10px; }
+  th, td { text-align:left; padding:10px 8px; border-bottom:1px solid #35304a; font-size:14px; }
+  th { color:#999; font-weight:600; font-size:12px; text-transform:uppercase; }
+  td img { width:56px; height:40px; object-fit:cover; border-radius:4px; vertical-align:middle; margin-right:10px; }
+  .table-actions button { font-size:12px; padding:6px 12px; margin-right:6px; }
+  .real-badge { background:#2c5a2c; color:#a8e6a8; font-size:10px; padding:2px 8px; border-radius:10px; margin-left:8px; }
+  .draft-badge { background:#5a4a1a; color:#f0d080; font-size:10px; padding:2px 8px; border-radius:10px; margin-left:8px; }
+
+  .export-box { background:#1a3a2a; border:1px solid #2c5a3a; padding:18px; border-radius:12px; margin-top:16px; font-size:13px; line-height:1.6; color:#cde; }
+  .export-box code { background:#0a0812; padding:2px 6px; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<nav id="site-nav">
+  <a href="index.html">Home</a>
+  <a href="portfolio.html">Portfolio</a>
+  <a href="business.html">Business</a>
+  <a href="collaborations.html">Collaboration</a>
+  <a href="future-goals.html">Future Goals</a>
+  <a href="contact.html">Contact</a>
+</nav>
+
+<div id="login-gate">
+  <h2 style="color:#fff;">Admin Login</h2>
+  <input type="text" id="login-pass" placeholder="Password">
+  <button onclick="tryLogin()">Enter</button>
+  <div id="login-error"></div>
+</div>
+
+<div class="admin-wrap" id="admin-panel" style="display:none;">
+  <div class="admin-title">Portfolio Admin</div>
+  <p class="admin-sub">
+    This site has no backend/database, so changes you make here are saved only to <b>this browser</b>
+    for preview. To make a change permanent for every visitor, use <b>Export projects.json</b> below
+    and replace the file at <code>/data/projects.json</code> in your deployed site, then re-upload.
+  </p>
+
+  <div class="panel">
+    <h2 id="form-heading">Add a New Project</h2>
+    <input type="hidden" id="edit-slug" value="">
+
+    <div class="row">
+      <div>
+        <label>Project Title</label>
+        <input type="text" id="f-title" placeholder="e.g. Patato Cannon">
+      </div>
+      <div>
+        <label>Category</label>
+        <select id="f-category">
+          <option>Robotics & FRC</option>
+          <option>Electronics & Arduino</option>
+          <option>Software & AI</option>
+          <option>Physical Builds</option>
+          <option>Business & Web</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Project Photo</label>
+    <input type="file" id="f-photo" accept="image/*" onchange="previewPhoto(event)">
+    <img id="photo-preview" class="photo-preview" style="display:none;">
+
+    <label>Link to original PDF report (optional — paste a URL, e.g. a Google Drive share link)</label>
+    <input type="url" id="f-pdf" placeholder="https://drive.google.com/...">
+
+    <label>Project Overview</label>
+    <textarea id="f-overview" placeholder="What was this project?"></textarea>
+
+    <label>Why?</label>
+    <textarea id="f-why"></textarea>
+
+    <label>How</label>
+    <textarea id="f-how"></textarea>
+
+    <label>Conclusion</label>
+    <textarea id="f-conclusion"></textarea>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveProject()">Save Project</button>
+      <button class="btn btn-secondary" onclick="resetForm()">Clear Form</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>All Projects (<span id="project-count">0</span>)</h2>
+    <table>
+      <thead><tr><th>Project</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="project-table-body"></tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Publish Changes</h2>
+    <p style="font-size:13px; color:#bbb;">Download the merged data (base site + your local edits/additions) and swap it into the live site.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="exportData()">Export projects.json</button>
+      <button class="btn btn-danger" onclick="clearLocalChanges()">Discard All Local Changes</button>
+    </div>
+    <div class="export-box">
+      <b>To publish for real:</b> download the file above, replace <code>site/data/projects.json</code>
+      in your project folder with it, then re-deploy (re-upload to Netlify/Vercel or wherever the site lives).
+      New photos you uploaded here are embedded directly in that JSON file, so they'll come along automatically.
+    </div>
+  </div>
+</div>
+
+<script src="assets/data-layer.js"></script>
+<script>
+const ADMIN_PASSWORD = "sebtech"; // simple gate, not real security — change this string if you want
+
+function tryLogin() {
+  const val = document.getElementById('login-pass').value;
+  if (val === ADMIN_PASSWORD) {
+    document.getElementById('login-gate').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    refreshTable();
+  } else {
+    document.getElementById('login-error').textContent = 'Wrong password.';
+  }
+}
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+
+let currentPhotoDataURL = null;
+
+function previewPhoto(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  fileToDataURL(file).then(url => {
+    currentPhotoDataURL = url;
+    const img = document.getElementById('photo-preview');
+    img.src = url;
+    img.style.display = 'block';
+  });
+}
+
+function resetForm() {
+  document.getElementById('edit-slug').value = '';
+  document.getElementById('form-heading').textContent = 'Add a New Project';
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-category').value = 'Physical Builds';
+  document.getElementById('f-pdf').value = '';
+  document.getElementById('f-overview').value = '';
+  document.getElementById('f-why').value = '';
+  document.getElementById('f-how').value = '';
+  document.getElementById('f-conclusion').value = '';
+  document.getElementById('photo-preview').style.display = 'none';
+  currentPhotoDataURL = null;
+}
+
+async function saveProject() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { alert('Give the project a title first.'); return; }
+
+  const editSlug = document.getElementById('edit-slug').value;
+  const slug = editSlug || slugify(title);
+
+  const overrides = getLocalOverrides();
+  const projects = await loadMergedProjects();
+  const existing = projects.find(p => p.slug === slug);
+
+  const entry = {
+    slug,
+    title,
+    category: document.getElementById('f-category').value,
+    image: currentPhotoDataURL || (existing ? existing.image : 'https://placehold.co/700x500/1a1a2e/999999?text=' + encodeURIComponent(title)),
+    pdfLink: document.getElementById('f-pdf').value.trim(),
+    overview: document.getElementById('f-overview').value.trim(),
+    why: document.getElementById('f-why').value.trim(),
+    how: document.getElementById('f-how').value.trim(),
+    conclusion: document.getElementById('f-conclusion').value.trim(),
+    hasRealContent: true,
+  };
+
+  if (existing) {
+    overrides.edits[slug] = entry;
+  } else {
+    overrides.additions.push(entry);
+  }
+  saveLocalOverrides(overrides);
+  resetForm();
+  refreshTable();
+}
+
+function editProject(slug, projects) {
+  const p = projects.find(x => x.slug === slug);
+  if (!p) return;
+  document.getElementById('edit-slug').value = p.slug;
+  document.getElementById('form-heading').textContent = 'Editing: ' + p.title;
+  document.getElementById('f-title').value = p.title;
+  document.getElementById('f-category').value = p.category;
+  document.getElementById('f-pdf').value = p.pdfLink || '';
+  document.getElementById('f-overview').value = p.overview || '';
+  document.getElementById('f-why').value = p.why || '';
+  document.getElementById('f-how').value = p.how || '';
+  document.getElementById('f-conclusion').value = p.conclusion || '';
+  currentPhotoDataURL = null;
+  const img = document.getElementById('photo-preview');
+  img.src = p.image; img.style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+async function deleteProject(slug) {
+  if (!confirm('Remove this project from your local draft view?')) return;
+  const overrides = getLocalOverrides();
+  if (overrides.additions.some(p => p.slug === slug)) {
+    overrides.additions = overrides.additions.filter(p => p.slug !== slug);
+  } else {
+    overrides.deletions.push(slug);
+  }
+  saveLocalOverrides(overrides);
+  refreshTable();
+}
+
+async function refreshTable() {
+  const projects = await loadMergedProjects();
+  const overrides = getLocalOverrides();
+  document.getElementById('project-count').textContent = projects.length;
+  const tbody = document.getElementById('project-table-body');
+  tbody.innerHTML = '';
+  projects.forEach(p => {
+    const isDraft = overrides.edits[p.slug] || overrides.additions.some(a => a.slug === p.slug);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><img src="${p.image}" alt=""> ${p.title}</td>
+      <td>${p.category}</td>
+      <td>${isDraft ? '<span class="draft-badge">local draft</span>' : (p.hasRealContent ? '<span class="real-badge">published</span>' : '<span class="draft-badge">placeholder</span>')}</td>
+      <td class="table-actions">
+        <button class="btn btn-secondary" onclick='editProject("${p.slug}", ${JSON.stringify(projects).replace(/'/g,"&#39;")})'>Edit</button>
+        <button class="btn btn-danger" onclick="deleteProject('${p.slug}')">Remove</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function exportData() {
+  const merged = await loadMergedProjects();
+  downloadJSON(merged, 'projects.json');
+}
+
+function clearLocalChanges() {
+  if (!confirm('This discards all unpublished local edits/additions in this browser. Continue?')) return;
+  localStorage.removeItem(ADMIN_KEY);
+  refreshTable();
+}
+</script>
+</body>
+</html>
